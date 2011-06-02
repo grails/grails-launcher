@@ -1,9 +1,9 @@
-## grails-exec 
+## grails-launcher 
 
-A thin jar with **no dependencies** for executing Grails (with an isolated classpath) programatically (e.g from Maven or Gradle).
+A thin jar with **no dependencies** for launching Grails (with an isolated classpath) programatically (e.g from Maven or Gradle) in the same JVM.
 
-    import grails.exec.Executor
-    import grails.exec.RootLoader
+    import grails.launcher.GrailsLauncher
+    import grails.launcher.RootLoader
 
     // Setup the classpath for Grails
     def classpath = []
@@ -15,5 +15,5 @@ A thin jar with **no dependencies** for executing Grails (with an isolated class
     // Create a root class loader
     def classloader = new RootLoader(classpath)
 
-    def executor = new GrailsExecutor(classloader, null, "/a/grails/project")
-    executor.execute("test-app", "integration some.package.*", "-Dsome.system.property=true")
+    def launcher = new GrailsLauncher(classloader, null, "/a/grails/project")
+    launcher.launch("test-app", "integration some.package.*")
