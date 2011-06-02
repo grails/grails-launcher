@@ -1,15 +1,27 @@
+import org.grails.exec.GrailsVersion
+
 description: "A test harness for grails-exec that can run with multiple Grails grailsVersions"
 
-dependsOn ":grails-exec"
-
 buildscript {
+    repositories {
+        flatDir name: 'grails-exec', dirs: "$projectDir/../grails-exec/build/libs"
+    }
     dependencies {
-        classpath project(":grails-exec")
+        classpath ":grails-exec:latest.integration"
     }
 }
 
+apply plugin: "groovy"
+
+repositories {
+    mavenCentral()
+    flatDir name: 'grails-exec', dirs: "$projectDir/../grails-exec/build/libs"
+}
+
 dependencies { 
-    testCompile project(":grails-exec")
+    groovy "org.codehaus.groovy:groovy-all:1.7.10"
+    testCompile ":grails-exec:latest.integration"
+    testCompile "org.spockframework:spock-core:0.5-groovy-1.7"
 }
 
 task test (overwrite: true) {}
@@ -20,7 +32,7 @@ testWith "1.3.0", "1.3.1", "1.3.2", "1.3.3", "1.3.4", "1.3.6", "1.3.7"
 def testWith(String... grailsVersions) {
     grailsVersions.each { grailsVersion ->
 
-        def versionQuirks = new org.grails.exec.GrailsVersion(grailsVersion)
+        def versionQuirks = new GrailsVersion(grailsVersion)
         
         def grailsBootstrapClasspathName = "grailsBootstrap-$grailsVersion"
         def grailsCompileClasspathName = "grailsCompile-$grailsVersion"
@@ -83,4 +95,8 @@ def testWith(String... grailsVersions) {
         
         tasks.test.dependsOn tasks.getByName(testTaskName)
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "1.0-milestone-3"
 }
