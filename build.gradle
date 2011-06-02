@@ -8,6 +8,13 @@ subprojects {
     repositories {
         mavenCentral()
     }
+
+    // Move the Groovy config into the test space so we don't have groovy
+    // on our runtime classpath and as a runtime dependency
+    configurations {
+        compile.extendsFrom = []
+        testCompile.extendsFrom groovy
+    }
     
     dependencies {
         groovy "org.codehaus.groovy:groovy-all:1.7.10"
