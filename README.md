@@ -2,8 +2,8 @@
 
 A thin jar with **no dependencies** for launching Grails (with an isolated classpath) programatically (e.g from Maven or Gradle) in the same JVM.
 
-    import grails.launcher.GrailsLauncher
-    import grails.launcher.RootLoader
+    import org.grails.launcher.GrailsLauncher
+    import org.grails.launcher.RootLoader
 
     // Setup the classpath for Grails
     def classpath = []
