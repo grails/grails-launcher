@@ -146,4 +146,14 @@ public class RootLoader extends URLClassLoader {
     protected Class findClass(String name) throws ClassNotFoundException {
         throw new ClassNotFoundException(name);
     }
+    
+    /**
+     * Groovy adds a method of this name that searches the loader hierarchy looking for Groovy's root loader class.
+     * Since this is the same thing, we override this and just return ourselves.
+     * 
+     * @see http://groovy.codehaus.org/groovy-jdk/java/lang/ClassLoader.html#getRootLoader()
+     */
+    public ClassLoader getRootLoader() {
+        return this;
+    }
 }
