@@ -1,3 +1,5 @@
+import org.apache.ivy.util.url.CredentialsStore
+
 subprojects {
     apply plugin: "groovy"
     apply plugin: "maven"
@@ -19,6 +21,60 @@ subprojects {
     dependencies {
         groovy "org.codehaus.groovy:groovy-all:1.7.10"
         testCompile "org.spockframework:spock-core:0.5-groovy-1.7"
+    }
+    
+    uploadArchives {
+        repositories {
+            project.deployer = repositories.mavenDeployer {
+                def username = project.properties["grailsRepoUsername"]
+                def password = project.properties["grailsRepoPassword"]
+
+                if (username && password) {
+                    CredentialsStore.INSTANCE.addCredentials("Artifactory Realm", "repo.grails.org", username, password)
+                }
+                
+                repository(url: "http://repo.grails.org/grails/libs-releases-local") {
+                    authentication(userName: codehausUsername, password: codehausPassword)
+                }
+                snapshotRepository(url: "http://repo.grails.org/grails/libs-snapshots-local") {
+                    authentication(userName: codehausUsername, password: codehausPassword)
+                }
+                pom.project {
+                    name "Grails Exec"
+                    description "A standalone library for launching any version of Grails in the same JVM with an isolated classpath"
+                    url "http://grails.org"
+                    inceptionYear "2011"
+                    licenses {
+                        license {
+                            name 'The Apache Software License, Version 2.0'
+                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            distribution 'repo'
+                        }
+                    }
+                    scm {
+                        url "https://github.com/grails/grails-exec/"
+                    }
+                    developers {
+                        [pledbrook: "Peter Ledbrook", ldaley: "Luke Daley"].each { devId, devName ->
+                            developer {
+                                id devId
+                                name devName
+                                roles {
+                                    role "Developer"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    project.poms = [project.install.repositories.mavenInstaller.pom, project.deployer.pom]
+    project.pomModifications = []
+    project.modifyPom = { Closure modification -> project.pomModifications << modification }
+    project.poms*.whenConfigured {
+        project.pomModifications*.call(it)
     }
 }
 
