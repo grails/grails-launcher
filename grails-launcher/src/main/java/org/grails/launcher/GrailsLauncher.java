@@ -83,6 +83,17 @@ public class GrailsLauncher {
             throw new RuntimeException(ex);
         }
     }
+    
+    public void setPlainOutput(boolean isPlain) {
+        try {
+            Class<?> clazz = classLoader.loadClass("grails.build.logging.GrailsConsole");                    
+            Object console = clazz.getMethod("getInstance").invoke(clazz);
+            console.getClass().getMethod("setAnsiEnabled", new Class[]{ boolean.class}).invoke(console, !isPlain);
+        }
+        catch (Exception e) {
+            // do nothing, Grails 1.3.x or lower
+        }
+    }
 
     /**
      * Executes the named Grails script with no arguments.
