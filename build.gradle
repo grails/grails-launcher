@@ -1,5 +1,22 @@
 import org.apache.ivy.util.url.CredentialsStore
 
+allprojects {
+    apply plugin: "idea"
+}
+
+idea {
+  project {
+    jdkName "1.6"
+    ipr {
+      withXml { provider ->
+        def node = provider.asNode()
+        node.component.find { it.'@name' == 'VcsDirectoryMappings' }?.mapping[0].'@vcs' = 'Git'
+        node.append(new XmlParser().parse(file("ideaCodeStyle.xml")))
+      }
+    }
+  }
+}
+
 subprojects { project ->
     description = "A standalone library for launching any version of Grails in the same JVM with an isolated classpath"
     
@@ -87,5 +104,5 @@ subprojects { project ->
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = "1.0-milestone-6"
+    gradleVersion = "1.0-milestone-7"
 }
