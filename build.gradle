@@ -1,12 +1,15 @@
 import org.apache.ivy.util.url.CredentialsStore
 
+apply plugin: 'idea'
+    
 subprojects { project ->
     description = "A standalone library for launching any version of Grails in the same JVM with an isolated classpath"
     
     apply plugin: "groovy"
     apply plugin: "maven"
 
-    version = "1.0.1"
+
+    version = "1.0.3"
     group = "org.grails" 
     
     repositories {

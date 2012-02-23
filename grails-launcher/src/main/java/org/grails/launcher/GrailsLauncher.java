@@ -239,6 +239,28 @@ public class GrailsLauncher {
         invokeMethod(settings, "setTestDependencies", new Class[] { List.class }, new Object[] { dependencies });
     }
 
+
+    @SuppressWarnings("rawtypes")
+    public List getProvidedDependencies() {
+        return (List) invokeMethod(settings, "getProvidedDependencies", new Object[0]);
+    }
+
+    @SuppressWarnings("rawtypes")
+    public void setProvidedDependencies(List dependencies) {
+        invokeMethod(settings, "setProvidedDependencies", new Class[] { List.class }, new Object[] { dependencies });
+    }
+
+    @SuppressWarnings("rawtypes")
+    public void setBuildDependencies(List dependencies) {
+        invokeMethod(settings, "setBuildDependencies", new Class[] { List.class }, new Object[] { dependencies });
+    }
+
+    @SuppressWarnings("rawtypes")
+    public List getBuildDependencies() {
+        return (List) invokeMethod(settings, "getBuildDependencies", new Object[0]);
+    }
+
+
     @SuppressWarnings("rawtypes")
     public List getRuntimeDependencies() {
         return (List) invokeMethod(settings, "getRuntimeDependencies", new Object[0]);
