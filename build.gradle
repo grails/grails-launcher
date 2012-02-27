@@ -23,7 +23,8 @@ subprojects { project ->
     apply plugin: "groovy"
     apply plugin: "maven"
 
-    version = "1.0.0"
+
+    version = "1.0.3"
     group = "org.grails" 
     
     repositories {

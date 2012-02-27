@@ -33,6 +33,9 @@ class GrailsLauncherTests extends GroovyTestCase {
         def testTestDeps = [ "3", "4", "5" ]
         def testRuntimeDeps = [ "7" ]
 
+        def testBuildDeps = [ "8", "9"]
+        def testProvidedDeps = [ "10" ]
+
         def testHelper = new GrailsLauncher(new CustomClassLoader(this))
         testHelper.grailsWorkDir = new File("global-work")
         testHelper.projectWorkDir = new File("target")
@@ -45,6 +48,8 @@ class GrailsLauncherTests extends GroovyTestCase {
         testHelper.compileDependencies = testCompileDeps
         testHelper.testDependencies = testTestDeps
         testHelper.runtimeDependencies = testRuntimeDeps
+        testHelper.providedDependencies = testProvidedDeps
+        testHelper.buildDependencies = testBuildDeps
 
         assertEquals new File("global-work"), testSettings.grailsWorkDir
         assertEquals new File("target"), testSettings.projectWorkDir
@@ -57,6 +62,10 @@ class GrailsLauncherTests extends GroovyTestCase {
         assertEquals testCompileDeps, testSettings.compileDependencies
         assertEquals testTestDeps, testSettings.testDependencies
         assertEquals testRuntimeDeps, testSettings.runtimeDependencies
+        assertEquals testProvidedDeps, testSettings.providedDependencies
+        assertEquals testBuildDeps, testSettings.buildDependencies
+
+
 
         // Try executing a script with these settings.
         assertEquals 0, testHelper.launch("Compile")
@@ -101,6 +110,8 @@ class MockBuildSettings {
     List compileDependencies
     List testDependencies
     List runtimeDependencies
+    List providedDependencies
+    List buildDependencies
     URLClassLoader rootLoader
     boolean dependenciesExternallyConfigured = false
 

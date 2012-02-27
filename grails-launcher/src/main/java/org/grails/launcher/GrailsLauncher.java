@@ -83,6 +83,17 @@ public class GrailsLauncher {
             throw new RuntimeException(ex);
         }
     }
+    
+    public void setPlainOutput(boolean isPlain) {
+        try {
+            Class<?> clazz = classLoader.loadClass("grails.build.logging.GrailsConsole");                    
+            Object console = clazz.getMethod("getInstance").invoke(clazz);
+            console.getClass().getMethod("setAnsiEnabled", new Class[]{ boolean.class}).invoke(console, !isPlain);
+        }
+        catch (Exception e) {
+            // do nothing, Grails 1.3.x or lower
+        }
+    }
 
     /**
      * Executes the named Grails script with no arguments.
@@ -227,6 +238,28 @@ public class GrailsLauncher {
     public void setTestDependencies(List dependencies) {
         invokeMethod(settings, "setTestDependencies", new Class[] { List.class }, new Object[] { dependencies });
     }
+
+
+    @SuppressWarnings("rawtypes")
+    public List getProvidedDependencies() {
+        return (List) invokeMethod(settings, "getProvidedDependencies", new Object[0]);
+    }
+
+    @SuppressWarnings("rawtypes")
+    public void setProvidedDependencies(List dependencies) {
+        invokeMethod(settings, "setProvidedDependencies", new Class[] { List.class }, new Object[] { dependencies });
+    }
+
+    @SuppressWarnings("rawtypes")
+    public void setBuildDependencies(List dependencies) {
+        invokeMethod(settings, "setBuildDependencies", new Class[] { List.class }, new Object[] { dependencies });
+    }
+
+    @SuppressWarnings("rawtypes")
+    public List getBuildDependencies() {
+        return (List) invokeMethod(settings, "getBuildDependencies", new Object[0]);
+    }
+
 
     @SuppressWarnings("rawtypes")
     public List getRuntimeDependencies() {
