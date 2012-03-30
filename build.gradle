@@ -24,7 +24,7 @@ subprojects { project ->
     apply plugin: "maven"
 
 
-    version = "1.0.3"
+    version = "1.0.4.BUILD-SNAPSHOT"
     group = "org.grails" 
     
     repositories {
