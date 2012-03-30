@@ -57,9 +57,9 @@ subprojects { project ->
         archives sourcesJar, javadocJar
     }
 
-    project.poms = [project.install.repositories.mavenInstaller.pom]
+    project.ext.poms = [project.install.repositories.mavenInstaller.pom]
     uploadArchives {
-        project.deployer = repositories.mavenDeployer {
+        project.ext.deployer = repositories.mavenDeployer {
             def username = project.hasProperty("grailsRepoUsername") ? project.grailsRepoUsername : null
             def password = project.hasProperty("grailsRepoPassword") ? project.grailsRepoPassword : null
 
@@ -77,8 +77,8 @@ subprojects { project ->
         project.poms << project.deployer.pom
     }
     
-    project.pomModifications = []
-    project.modifyPom = { Closure modification -> project.pomModifications << modification }
+    project.ext.pomModifications = []
+    project.ext.modifyPom = { Closure modification -> project.pomModifications << modification }
     project.poms*.whenConfigured { pom ->
         project.pomModifications.each { modification ->
             pom.project {
