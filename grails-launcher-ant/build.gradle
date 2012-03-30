@@ -3,6 +3,3 @@ dependencies {
     compile "org.apache.ant:ant:1.8.2"
 }
 
-modifyPom {
-    description = project.description + " (for Apache Ant)"
-}
