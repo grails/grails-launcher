@@ -36,7 +36,7 @@ public class GrailsLauncher {
     /**
      * Creates a helper that loads the Grails build system with the given
      * class loader. Ideally, the class loader should be an instance of
-     * {@link RootLoader}.
+     * {@link org.grails.launcher.rootloader.RootLoader}.
      * You can try other class loaders, but you may run into problems.
      * @param classLoader The class loader that will be used to load Grails.
      */

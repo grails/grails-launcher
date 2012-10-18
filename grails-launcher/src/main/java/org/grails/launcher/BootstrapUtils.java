@@ -16,6 +16,8 @@
 
 package org.grails.launcher;
 
+import org.grails.launcher.rootloader.RootLoader;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;

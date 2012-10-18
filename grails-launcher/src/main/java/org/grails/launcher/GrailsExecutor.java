@@ -16,6 +16,9 @@
 
 package org.grails.launcher;
 
+import org.grails.launcher.rootloader.RootLoader;
+import org.grails.launcher.rootloader.RootLoaderFactory;
+
 import java.net.MalformedURLException;
 
 public class GrailsExecutor {
