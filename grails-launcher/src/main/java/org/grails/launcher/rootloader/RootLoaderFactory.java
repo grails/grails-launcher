@@ -16,7 +16,7 @@
 
 package org.grails.launcher.rootloader;
 
-import org.grails.launcher.GrailsExecutionContext;
+import org.grails.launcher.GrailsLaunchContext;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -26,7 +26,7 @@ import java.util.List;
 
 public class RootLoaderFactory {
 
-    public RootLoader create(GrailsExecutionContext context) throws MalformedURLException, ClassNotFoundException {
+    public RootLoader create(GrailsLaunchContext context) throws MalformedURLException, ClassNotFoundException {
         URL[] urls = generateBuildPath(context.getBuildDependencies());
         final RootLoader rootLoader = new RootLoader(urls, ClassLoader.getSystemClassLoader());
 

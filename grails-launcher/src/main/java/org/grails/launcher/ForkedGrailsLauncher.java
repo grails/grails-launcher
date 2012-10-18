@@ -31,14 +31,14 @@ import java.util.List;
 public class ForkedGrailsLauncher {
 
 
-    private GrailsExecutionContext executionContext;
+    private GrailsLaunchContext launchContext;
     private int maxMemory = 1024;
     private int minMemory = 512;
     private int maxPerm = 256;
     private boolean debug;
 
-    public ForkedGrailsLauncher(GrailsExecutionContext executionContext) {
-        this.executionContext = executionContext;
+    public ForkedGrailsLauncher(GrailsLaunchContext launchContext) {
+        this.launchContext = launchContext;
     }
 
     public void setMaxMemory(int maxMemory) {
@@ -60,7 +60,7 @@ public class ForkedGrailsLauncher {
     public void fork() {
         ProcessBuilder processBuilder = new ProcessBuilder();
         StringBuilder cp = new StringBuilder();
-        for (File file : executionContext.getBuildDependencies()) {
+        for (File file : launchContext.getBuildDependencies()) {
             cp.append(file).append(File.pathSeparator);
         }
 
@@ -68,13 +68,13 @@ public class ForkedGrailsLauncher {
         FileOutputStream fos = null;
         File tempFile = null;
         try {
-            String baseName = executionContext.getBaseDir().getCanonicalFile().getName();
+            String baseName = launchContext.getBaseDir().getCanonicalFile().getName();
             tempFile = File.createTempFile(baseName, "grails-execution-context");
             tempFile.deleteOnExit();
 
             fos = new FileOutputStream(tempFile);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(executionContext);
+            oos.writeObject(launchContext);
 
 
             List<String> cmd = new ArrayList<String>(Arrays.asList("java", "-Xmx" + maxMemory + "M", "-Xms" + minMemory + "M", "-XX:MaxPermSize=" + maxPerm + "m", "-Dgrails.build.execution.context=" + tempFile.getCanonicalPath(), "-cp", cp.toString()));
@@ -83,7 +83,7 @@ public class ForkedGrailsLauncher {
             }
             cmd.add(getClass().getName());
             processBuilder
-                    .directory(executionContext.getBaseDir())
+                    .directory(launchContext.getBaseDir())
                     .redirectErrorStream(true)
                     .command(cmd);
 
@@ -123,7 +123,7 @@ public class ForkedGrailsLauncher {
             try {
                 fis = new FileInputStream(f);
                 ObjectInputStream ois = new ObjectInputStream(fis);
-                GrailsExecutionContext ec = (GrailsExecutionContext) ois.readObject();
+                GrailsLaunchContext ec = (GrailsLaunchContext) ois.readObject();
 
                 System.setProperty("grails.console.enable.terminal", "false");
                 System.setProperty("grails.console.enable.interactive", "false");

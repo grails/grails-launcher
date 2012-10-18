@@ -22,7 +22,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.List;
 
-public class GrailsExecutionContext implements Serializable {
+public class GrailsLaunchContext implements Serializable {
 
     private GrailsVersion grailsVersion;
 
@@ -44,7 +44,7 @@ public class GrailsExecutionContext implements Serializable {
     private String env;
     private String args;
 
-    public GrailsExecutionContext(GrailsVersion grailsVersion) {
+    public GrailsLaunchContext(GrailsVersion grailsVersion) {
         this.grailsVersion = grailsVersion;
     }
 

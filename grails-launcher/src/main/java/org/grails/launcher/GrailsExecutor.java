@@ -23,7 +23,7 @@ import java.net.MalformedURLException;
 
 public class GrailsExecutor {
 
-    int execute(GrailsExecutionContext context) throws MalformedURLException, ClassNotFoundException {
+    int execute(GrailsLaunchContext context) throws MalformedURLException, ClassNotFoundException {
         RootLoader rootLoader = new RootLoaderFactory().create(context);
         final GrailsLauncher launcher = new GrailsLauncher(rootLoader, null, context.getBaseDir().getAbsolutePath());
         launcher.setPlainOutput(true);
