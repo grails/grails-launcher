@@ -1,33 +1,13 @@
-import org.apache.ivy.util.url.CredentialsStore
-
-allprojects {
-    apply plugin: "idea"
-}
-
-idea {
-  project {
-    jdkName "1.6"
-    ipr {
-      withXml { provider ->
-        def node = provider.asNode()
-        node.component.find { it.'@name' == 'VcsDirectoryMappings' }?.mapping[0].'@vcs' = 'Git'
-        node.append(new XmlParser().parse(file("ideaCodeStyle.xml")))
-      }
-    }
-  }
-}
-
 subprojects { project ->
     description = "A standalone library for launching any version of Grails in the same JVM with an isolated classpath"
-    
-    apply plugin: "groovy"
-    apply plugin: "maven"
-    apply plugin: 'signing'    
-
-
     version = "1.0.5"
     group = "org.grails"
     
+    apply plugin: "groovy"
+    apply plugin: "maven"
+    apply plugin: 'signing'
+    apply from: rootProject.file("gradle/publish.gradle")
+
     repositories {
         mavenCentral()
     }
@@ -38,12 +18,12 @@ subprojects { project ->
         compile.extendsFrom = []
         testCompile.extendsFrom groovy
     }
-    
+
     dependencies {
         groovy "org.codehaus.groovy:groovy-all:1.7.10"
         testCompile "org.spockframework:spock-core:0.5-groovy-1.7"
     }
-    
+
     task sourcesJar(type: Jar) {
         classifier "sources"
         from sourceSets.main.allSource
@@ -53,88 +33,22 @@ subprojects { project ->
         classifier "javadoc"
         from javadoc
     }
-    
+
     artifacts {
-        archives jar
-        archives sourcesJar
-        archives javadocJar
+        archives sourcesJar, javadocJar
     }
 
     signing {
         sign configurations.archives
     }
-
-
-    project.ext.poms = [project.install.repositories.mavenInstaller.pom]
-    
-    uploadArchives {
-        description = "Does a maven deploy of archives artifacts"
-
-        repositories.mavenDeployer {
-            beforeDeployment { MavenDeployment deployment ->
-                signing.signPom(deployment)
-            }
-
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: project.hasProperty("sonatypeUsername") ? project.sonatypeUsername : null,
-                        password: project.hasProperty("sonatypePassword") ?  project.sonatypePassword : null)
-            }
-            snapshotRepository(url: "http://repo.grails.org/grails/libs-snapshots-local") {
-                authentication(userName: project.hasProperty("artifactoryPublishUsername") ? project.artifactoryPublishUsername : null,
-                        password: project.hasProperty("artifactoryPublishPassword") ?  project.artifactoryPublishPassword : null)
-            }
-
-            pom.project {
-                name 'Grails Launcher'
-                packaging 'jar'
-                description 'Launcher for tools that wish to run Grails commands'
-                delegate.url 'http://grails.org/'
-
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
-                    }
-                }
-
-                scm {
-                    delegate.url 'scm:git@github.com:grails/grails-launcher.git'
-                    connection 'scm:git@github.com:grails/grails-launcher.git'
-                    developerConnection 'scm:git@github.com:grails/grails-launcher.git'
-                }
-
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        delegate.url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'alkemist'
-                        name 'Luke Daley'
-                    }
-                    
-                    developer {
-                        id 'graemerocher'
-                        name 'Graeme Rocher'
-                    }
-                    developer {
-                            id 'pledbrook'
-                            name 'Peter Ledbrook'
-                    }                    
-                }
-            }
-        }
-    }
-    
-    project.ext.modifyPom = { Closure modification -> project.pomModifications << modification }
-    
 }
 
+allprojects {
+    apply plugin: "idea"
+}
+
+apply from: "gradle/idea.gradle"
+
 task wrapper(type: Wrapper) {
-    gradleVersion = "1.0-milestone-7"
+    gradleVersion = "1.2"
 }
