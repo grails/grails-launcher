@@ -15,13 +15,15 @@
  */
 package org.grails.launcher.version;
 
+import java.io.Serializable;
+
 /**
  * Exposes build related information about a particular version of Grails.
  * <p>
  * Useful for build tools to setup a Grails execution conditionally based on the
  * version.
  */
-public class GrailsVersion {
+public class GrailsVersion implements Serializable {
     
     private final String string;
     private final int major;

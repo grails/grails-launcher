@@ -16,11 +16,16 @@
 
 package org.grails.launcher;
 
+import org.grails.launcher.version.GrailsVersion;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.List;
 
 public class GrailsExecutionContext implements Serializable {
+
+    private GrailsVersion grailsVersion;
+
     private List<File> compileDependencies;
     private List<File> runtimeDependencies;
     private List<File> buildDependencies;
@@ -38,6 +43,14 @@ public class GrailsExecutionContext implements Serializable {
     private String scriptName;
     private String env;
     private String args;
+
+    public GrailsExecutionContext(GrailsVersion grailsVersion) {
+        this.grailsVersion = grailsVersion;
+    }
+
+    public GrailsVersion getGrailsVersion() {
+        return grailsVersion;
+    }
 
     public String getScriptName() {
         return scriptName;
