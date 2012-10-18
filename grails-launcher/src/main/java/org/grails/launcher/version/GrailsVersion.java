@@ -18,13 +18,10 @@ package org.grails.launcher.version;
 import java.io.Serializable;
 
 /**
- * Exposes build related information about a particular version of Grails.
- * <p>
- * Useful for build tools to setup a Grails execution conditionally based on the
- * version.
+ * Exposes build related information about a particular version of Grails. <p> Useful for build tools to setup a Grails execution conditionally based on the version.
  */
 public class GrailsVersion implements Serializable {
-    
+
     private final String string;
     private final int major;
     private final int minor;
@@ -42,44 +39,41 @@ public class GrailsVersion implements Serializable {
     public String getString() {
         return string;
     }
-    
+
     public int getMajor() {
         return major;
     }
-    
+
     public int getMinor() {
         return minor;
     }
-    
+
     public int getPatch() {
         return patch;
     }
-    
+
     public String getTag() {
         return tag;
     }
-    
 
     public boolean is(int major) {
         return this.major == major;
     }
-    
+
     public boolean is(int major, int minor) {
         return this.major == major && this.minor == minor;
     }
-    
+
     public boolean is(int major, int minor, int patch) {
         return this.major == major && this.minor == minor && this.patch == patch;
     }
-    
+
     public boolean is13() {
-        return is(1,3);
+        return is(1, 3);
     }
 
     /**
-     * Grails 1.3.0 and 1.3.1 did not declare grails-bootstrap's dependency on Ivy.
-     * <p>
-     * If this returns true, an explicit dependency for Ivy must be added (e.g. "org.apache.ivy:ivy:2.1.0")
+     * Grails 1.3.0 and 1.3.1 did not declare grails-bootstrap's dependency on Ivy. <p> If this returns true, an explicit dependency for Ivy must be added (e.g. "org.apache.ivy:ivy:2.1.0")
      */
     public boolean isRequiresExplicitIvyDependency() {
         return is13() && patch < 2;
