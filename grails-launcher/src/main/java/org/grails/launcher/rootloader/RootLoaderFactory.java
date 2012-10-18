@@ -17,7 +17,6 @@
 package org.grails.launcher.rootloader;
 
 import org.grails.launcher.context.GrailsLaunchContext;
-import org.grails.launcher.util.ReflectionUtils;
 
 import java.io.File;
 import java.net.MalformedURLException;
