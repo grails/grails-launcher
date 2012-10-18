@@ -28,18 +28,12 @@ import java.util.List;
  * @author Graeme Rocher
  * @since 2.1
  */
-public class ForkedGrailsLauncher {
+public class ForkedGrailsLauncher implements GrailsLauncher {
 
-
-    private GrailsLaunchContext launchContext;
     private int maxMemory = 1024;
     private int minMemory = 512;
     private int maxPerm = 256;
     private boolean debug;
-
-    public ForkedGrailsLauncher(GrailsLaunchContext launchContext) {
-        this.launchContext = launchContext;
-    }
 
     public void setMaxMemory(int maxMemory) {
         this.maxMemory = maxMemory;
@@ -57,7 +51,7 @@ public class ForkedGrailsLauncher {
         this.debug = debug;
     }
 
-    public void fork() {
+    public int launch(GrailsLaunchContext launchContext) {
         ProcessBuilder processBuilder = new ProcessBuilder();
         StringBuilder cp = new StringBuilder();
         for (File file : launchContext.getBuildDependencies()) {
@@ -76,7 +70,6 @@ public class ForkedGrailsLauncher {
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(launchContext);
 
-
             List<String> cmd = new ArrayList<String>(Arrays.asList("java", "-Xmx" + maxMemory + "M", "-Xms" + minMemory + "M", "-XX:MaxPermSize=" + maxPerm + "m", "-Dgrails.build.execution.context=" + tempFile.getCanonicalPath(), "-cp", cp.toString()));
             if (debug) {
                 cmd.addAll(Arrays.asList("-Xdebug", "-Xnoagent", "-Dgrails.full.stacktrace=true", "-Djava.compiler=NONE", "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"));
@@ -92,11 +85,7 @@ public class ForkedGrailsLauncher {
             new Thread(new TextDumper(process.getInputStream(), System.out)).start();
             new Thread(new TextDumper(process.getErrorStream(), System.err)).start();
 
-            int result = process.waitFor();
-            if (result == 1) {
-
-                throw new RuntimeException("Forked Grails VM exited with error");
-            }
+            return process.waitFor();
         } catch (FileNotFoundException e) {
             throw new RuntimeException("Fatal error forking Grails JVM: " + e.getMessage(), e);
         } catch (IOException e) {
@@ -128,7 +117,7 @@ public class ForkedGrailsLauncher {
                 System.setProperty("grails.console.enable.terminal", "false");
                 System.setProperty("grails.console.enable.interactive", "false");
 
-                System.exit(new GrailsExecutor().execute(ec));
+                System.exit(new InProcessGrailsLauncher().launch(ec));
 
             } catch (FileNotFoundException e) {
                 fatalError(e);
