@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @author Peter Ledbrook
  */
-public class GrailsLauncher {
+public class ReflectiveGrailsLauncher {
 
     private ClassLoader classLoader;
     private Object settings;
@@ -40,7 +40,7 @@ public class GrailsLauncher {
      * You can try other class loaders, but you may run into problems.
      * @param classLoader The class loader that will be used to load Grails.
      */
-    public GrailsLauncher(ClassLoader classLoader) {
+    public ReflectiveGrailsLauncher(ClassLoader classLoader) {
         this(classLoader, null);
     }
 
@@ -52,7 +52,7 @@ public class GrailsLauncher {
      * @param classLoader The class loader that will be used to load Grails.
      * @param grailsHome Location of a local Grails installation.
      */
-    public GrailsLauncher(ClassLoader classLoader, String grailsHome) {
+    public ReflectiveGrailsLauncher(ClassLoader classLoader, String grailsHome) {
         this(classLoader, grailsHome, null);
     }
 
@@ -65,7 +65,7 @@ public class GrailsLauncher {
      * @param grailsHome Location of a local Grails installation.
      * @param baseDir The path to the Grails project to launch the command on
      */
-    public GrailsLauncher(ClassLoader classLoader, String grailsHome, String baseDir) {
+    public ReflectiveGrailsLauncher(ClassLoader classLoader, String grailsHome, String baseDir) {
         try {
             this.classLoader = classLoader;
             Class<?> clazz = classLoader.loadClass("grails.util.BuildSettings");

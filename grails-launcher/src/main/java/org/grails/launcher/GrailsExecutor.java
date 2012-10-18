@@ -25,7 +25,7 @@ public class GrailsExecutor {
 
     int execute(GrailsLaunchContext context) throws MalformedURLException, ClassNotFoundException {
         RootLoader rootLoader = new RootLoaderFactory().create(context);
-        final GrailsLauncher launcher = new GrailsLauncher(rootLoader, null, context.getBaseDir().getAbsolutePath());
+        final ReflectiveGrailsLauncher launcher = new ReflectiveGrailsLauncher(rootLoader, null, context.getBaseDir().getAbsolutePath());
         launcher.setPlainOutput(true);
         launcher.setDependenciesExternallyConfigured(true);
         launcher.setProvidedDependencies(context.getProvidedDependencies());

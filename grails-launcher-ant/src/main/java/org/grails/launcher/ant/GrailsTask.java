@@ -113,13 +113,13 @@ public class GrailsTask extends Task {
             URL[] loaderUrls = urls.toArray(new URL[urls.size()]);
             RootLoader rootLoader = new RootLoader(loaderUrls, getClass().getClassLoader());
 
-            GrailsLauncher launcher;
+            ReflectiveGrailsLauncher launcher;
             if (getProject().getBaseDir() != null) {
-                launcher = new GrailsLauncher(rootLoader, home == null ? null :
+                launcher = new ReflectiveGrailsLauncher(rootLoader, home == null ? null :
                     home.getCanonicalPath(), getProject().getBaseDir().getCanonicalPath());
             }
             else {
-                launcher = new GrailsLauncher(rootLoader, home == null ? null : home.getCanonicalPath());
+                launcher = new ReflectiveGrailsLauncher(rootLoader, home == null ? null : home.getCanonicalPath());
             }
 
             int retval;

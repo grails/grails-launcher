@@ -20,19 +20,19 @@ import junit.framework.AssertionFailedError
 import junit.framework.Assert
 
 /**
- * Test case for {@link GrailsLauncher}.
+ * Test case for {@link ReflectiveGrailsLauncher}.
  */
 class GrailsLauncherTests extends GroovyTestCase {
     def testRunner
     def testSettings
 
     void testSetDepedenciesExternallyConfigured() {
-        def testHelper = new GrailsLauncher(new CustomClassLoader(this))
+        def testHelper = new ReflectiveGrailsLauncher(new CustomClassLoader(this))
         testHelper.setDependenciesExternallyConfigured(true)
     }
 
     void testExecution() {
-        def testHelper = new GrailsLauncher(new CustomClassLoader(this))
+        def testHelper = new ReflectiveGrailsLauncher(new CustomClassLoader(this))
         assertEquals 0, testHelper.launch("Compile")
         assertEquals "Compile", testRunner.lastScript["name"]
         assertNull testRunner.lastScript["args"]
@@ -52,7 +52,7 @@ class GrailsLauncherTests extends GroovyTestCase {
         def testBuildDeps = [ "8", "9"]
         def testProvidedDeps = [ "10" ]
 
-        def testHelper = new GrailsLauncher(new CustomClassLoader(this))
+        def testHelper = new ReflectiveGrailsLauncher(new CustomClassLoader(this))
         testHelper.grailsWorkDir = new File("global-work")
         testHelper.projectWorkDir = new File("target")
         testHelper.classesDir = new File("target/classes")
