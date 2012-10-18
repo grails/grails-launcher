@@ -18,13 +18,13 @@ import java.util.List;
 public class ForkedGrailsLauncher {
 
 
-    private ExecutionContext executionContext;
+    private GrailsExecutionContext executionContext;
     private int maxMemory = 1024;
     private int minMemory = 512;
     private int maxPerm = 256;
     private boolean debug;
 
-    public ForkedGrailsLauncher(ExecutionContext executionContext) {
+    public ForkedGrailsLauncher(GrailsExecutionContext executionContext) {
         this.executionContext = executionContext;
     }
 
@@ -70,7 +70,7 @@ public class ForkedGrailsLauncher {
             }
             cmd.add(getClass().getName());
             processBuilder
-                    .directory(executionContext.baseDir)
+                    .directory(executionContext.getBaseDir())
                     .redirectErrorStream(true)
                     .command(cmd);
 
@@ -108,7 +108,7 @@ public class ForkedGrailsLauncher {
             try {
                 fis = new FileInputStream(f);
                 ObjectInputStream ois = new ObjectInputStream(fis);
-                ExecutionContext ec = (ExecutionContext) ois.readObject();
+                GrailsExecutionContext ec = (GrailsExecutionContext) ois.readObject();
 
                 URL[] urls = generateBuildPath(ec.getBuildDependencies());
                 final RootLoader rootLoader = new RootLoader(urls, ClassLoader.getSystemClassLoader());
@@ -130,22 +130,7 @@ public class ForkedGrailsLauncher {
                     invokeStaticMethod(cls, "initLogging", new Object[]{"classpath:grails-maven/log4j.properties"});
                 }
 
-
-                final GrailsLauncher launcher = new GrailsLauncher(rootLoader, null, ec.getBaseDir().getAbsolutePath());
-                launcher.setPlainOutput(true);
-                launcher.setDependenciesExternallyConfigured(true);
-                launcher.setProvidedDependencies(ec.getProvidedDependencies());
-                launcher.setCompileDependencies(ec.getCompileDependencies());
-                launcher.setTestDependencies(ec.getTestDependencies());
-                launcher.setRuntimeDependencies(ec.getRuntimeDependencies());
-                launcher.setGrailsWorkDir(ec.getGrailsWorkDir());
-                launcher.setProjectWorkDir(ec.getProjectWorkDir());
-                launcher.setClassesDir(ec.getClassesDir());
-                launcher.setTestClassesDir(ec.getTestClassesDir());
-                launcher.setResourcesDir(ec.getResourcesDir());
-                launcher.setProjectPluginsDir(ec.getProjectPluginsDir());
-                launcher.setBuildDependencies(ec.getBuildDependencies());
-                System.exit( launcher.launch(ec.getScriptName(), ec.getArgs(), ec.getEnv()) );
+                System.exit(new GrailsExecutor(rootLoader).execute(ec));
 
             } catch (FileNotFoundException e) {
                 fatalError(e);
@@ -211,147 +196,7 @@ public class ForkedGrailsLauncher {
         }
     }
 
-    public static class ExecutionContext implements Serializable {
-        private List<File> compileDependencies;
-        private List<File> runtimeDependencies;
-        private List<File> buildDependencies;
-        private List<File> providedDependencies;
-        private List<File> testDependencies;
-
-        private File grailsWorkDir;
-        private File projectWorkDir;
-        private File classesDir;
-        private File testClassesDir;
-        private File resourcesDir;
-        private File projectPluginsDir;
-        private File baseDir;
-
-        private String scriptName;
-        private String env;
-        private String args;
-
-        public String getScriptName() {
-            return scriptName;
-        }
-
-        public void setScriptName(String scriptName) {
-            this.scriptName = scriptName;
-        }
-
-        public String getEnv() {
-            return env;
-        }
-
-        public void setEnv(String env) {
-            this.env = env;
-        }
-
-        public String getArgs() {
-            return args;
-        }
-
-        public void setArgs(String args) {
-            this.args = args;
-        }
-
-        public File getBaseDir() {
-            return baseDir;
-        }
-
-        public void setBaseDir(File baseDir) {
-            this.baseDir = baseDir;
-        }
-
-        public List<File> getCompileDependencies() {
-            return compileDependencies;
-        }
-
-        public void setCompileDependencies(List<File> compileDependencies) {
-            this.compileDependencies = compileDependencies;
-        }
-
-        public List<File> getRuntimeDependencies() {
-            return runtimeDependencies;
-        }
-
-        public void setRuntimeDependencies(List<File> runtimeDependencies) {
-            this.runtimeDependencies = runtimeDependencies;
-        }
-
-        public List<File> getBuildDependencies() {
-            return buildDependencies;
-        }
-
-        public void setBuildDependencies(List<File> buildDependencies) {
-            this.buildDependencies = buildDependencies;
-        }
-
-        public List<File> getProvidedDependencies() {
-            return providedDependencies;
-        }
-
-        public void setProvidedDependencies(List<File> providedDependencies) {
-            this.providedDependencies = providedDependencies;
-        }
-
-        public List<File> getTestDependencies() {
-            return testDependencies;
-        }
-
-        public void setTestDependencies(List<File> testDependencies) {
-            this.testDependencies = testDependencies;
-        }
-
-        public File getGrailsWorkDir() {
-            return grailsWorkDir;
-        }
-
-        public void setGrailsWorkDir(File grailsWorkDir) {
-            this.grailsWorkDir = grailsWorkDir;
-        }
-
-        public File getProjectWorkDir() {
-            return projectWorkDir;
-        }
-
-        public void setProjectWorkDir(File projectWorkDir) {
-            this.projectWorkDir = projectWorkDir;
-        }
-
-        public File getClassesDir() {
-            return classesDir;
-        }
-
-        public void setClassesDir(File classesDir) {
-            this.classesDir = classesDir;
-        }
-
-        public File getTestClassesDir() {
-            return testClassesDir;
-        }
-
-        public void setTestClassesDir(File testClassesDir) {
-            this.testClassesDir = testClassesDir;
-        }
-
-        public File getResourcesDir() {
-            return resourcesDir;
-        }
-
-        public void setResourcesDir(File resourcesDir) {
-            this.resourcesDir = resourcesDir;
-        }
-
-        public File getProjectPluginsDir() {
-            return projectPluginsDir;
-        }
-
-        public void setProjectPluginsDir(File projectPluginsDir) {
-            this.projectPluginsDir = projectPluginsDir;
-        }
-    }
-
-    private static class TextDumper implements Runnable {
+  private static class TextDumper implements Runnable {
         InputStream in;
         Appendable app;
 
