@@ -17,6 +17,8 @@
 package org.grails.launcher;
 
 
+import org.grails.launcher.context.GrailsLaunchContext;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;

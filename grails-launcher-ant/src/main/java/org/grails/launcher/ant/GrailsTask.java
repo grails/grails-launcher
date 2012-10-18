@@ -29,8 +29,12 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.Reference;
+import org.grails.launcher.ReflectiveGrailsLauncher;
+import org.grails.launcher.context.DelegatingGrailsLaunchContext;
+import org.grails.launcher.context.SerializableGrailsLaunchContext;
 import org.grails.launcher.rootloader.RootLoader;
 import org.grails.launcher.util.NameUtils;
+import org.grails.launcher.version.GrailsVersionParser;
 
 /**
  * <p>Ant task for executing Grails scripts. To use it, first create a
@@ -76,6 +80,7 @@ public class GrailsTask extends Task {
     private String script;
     private String args;
     private String environment;
+    private String grailsVersion;
     private boolean includeRuntimeClasspath = true;
     private Path classpath;
 
@@ -87,6 +92,8 @@ public class GrailsTask extends Task {
     public void execute() throws BuildException {
         // The "script" must be specified.
         if (script == null) throw new BuildException("'script' must be provided.");
+
+        if (grailsVersion == null) throw new BuildException("'grailsVersion' must be provided.");
 
         // Check that one, and only one, of Grails home and classpath are set.
         if (home == null && classpath == null) {
@@ -114,23 +121,15 @@ public class GrailsTask extends Task {
             URL[] loaderUrls = urls.toArray(new URL[urls.size()]);
             RootLoader rootLoader = new RootLoader(loaderUrls, getClass().getClassLoader());
 
-            ReflectiveGrailsLauncher launcher;
-            if (getProject().getBaseDir() != null) {
-                launcher = new ReflectiveGrailsLauncher(rootLoader, home == null ? null :
-                    home.getCanonicalPath(), getProject().getBaseDir().getCanonicalPath());
-            }
-            else {
-                launcher = new ReflectiveGrailsLauncher(rootLoader, home == null ? null : home.getCanonicalPath());
+            SerializableGrailsLaunchContext launchContext = new SerializableGrailsLaunchContext(new GrailsVersionParser().parse(grailsVersion));
+            launchContext.setGrailsHome(getHome());
+            launchContext.setBaseDir(getProject().getBaseDir());
+            if (environment != null) {
+                launchContext.setEnv(environment);
             }
 
-            int retval;
-            if (environment == null) {
-                retval = launcher.launch(targetName, args);
-            }
-            else {
-                retval = launcher.launch(targetName, args, environment);
-            }
-
+            DelegatingGrailsLaunchContext delegatingLaunchContext = DelegatingGrailsLaunchContext.copyOf(rootLoader, launchContext);
+            int retval = delegatingLaunchContext.launch();
             if (retval != 0) {
                 throw new BuildException("Grails returned non-zero value: " + retval);
             }
@@ -214,6 +213,14 @@ public class GrailsTask extends Task {
 
     public void setScript(String script) {
         this.script = script;
+    }
+
+    public String getGrailsVersion() {
+        return grailsVersion;
+    }
+
+    public void setGrailsVersion(String grailsVersion) {
+        this.grailsVersion = grailsVersion;
     }
 
     public String getArgs() {

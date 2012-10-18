@@ -16,6 +16,8 @@
 
 package org.grails.launcher;
 
+import org.grails.launcher.context.GrailsLaunchContext;
+
 public interface GrailsLauncher {
 
     int launch(GrailsLaunchContext context) throws Exception;

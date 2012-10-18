@@ -16,30 +16,15 @@
 
 package org.grails.launcher;
 
+import org.grails.launcher.context.GrailsLaunchContext;
 import org.grails.launcher.rootloader.RootLoader;
 import org.grails.launcher.rootloader.RootLoaderFactory;
 
-import java.net.MalformedURLException;
-
 public class InProcessGrailsLauncher implements GrailsLauncher {
 
-    public int launch(GrailsLaunchContext context) throws MalformedURLException, ClassNotFoundException {
+    public int launch(GrailsLaunchContext context) throws Exception {
         RootLoader rootLoader = new RootLoaderFactory().create(context);
-        final ReflectiveGrailsLauncher launcher = new ReflectiveGrailsLauncher(rootLoader, null, context.getBaseDir().getAbsolutePath());
-        launcher.setPlainOutput(true);
-        launcher.setDependenciesExternallyConfigured(true);
-        launcher.setProvidedDependencies(context.getProvidedDependencies());
-        launcher.setCompileDependencies(context.getCompileDependencies());
-        launcher.setTestDependencies(context.getTestDependencies());
-        launcher.setRuntimeDependencies(context.getRuntimeDependencies());
-        launcher.setGrailsWorkDir(context.getGrailsWorkDir());
-        launcher.setProjectWorkDir(context.getProjectWorkDir());
-        launcher.setClassesDir(context.getClassesDir());
-        launcher.setTestClassesDir(context.getTestClassesDir());
-        launcher.setResourcesDir(context.getResourcesDir());
-        launcher.setProjectPluginsDir(context.getProjectPluginsDir());
-        launcher.setBuildDependencies(context.getBuildDependencies());
-        return launcher.launch(context.getScriptName(), context.getArgs(), context.getEnv());
+        return new ReflectiveGrailsLauncher(rootLoader).launch(context);
     }
 
 }
