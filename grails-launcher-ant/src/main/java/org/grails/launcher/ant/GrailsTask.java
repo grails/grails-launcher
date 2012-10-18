@@ -30,6 +30,7 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.Reference;
 import org.grails.launcher.rootloader.RootLoader;
+import org.grails.launcher.util.NameUtils;
 
 /**
  * <p>Ant task for executing Grails scripts. To use it, first create a
