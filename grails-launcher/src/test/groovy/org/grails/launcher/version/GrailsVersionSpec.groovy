@@ -13,29 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.grails.launcher
+package org.grails.launcher.version
 
-import spock.lang.*
+import spock.lang.Specification
+import spock.lang.Unroll
 
+@Unroll
 class GrailsVersionSpec extends Specification {
-    
+
     @Delegate GrailsVersion _v
-    
+
     void version(String v) {
-        _v = new GrailsVersion(v)
+        _v = new GrailsVersionParser().parse(v)
     }
 
-    @Unroll("version - #number")
-    def "valid parsing"() {
+    def "version - #string"() {
         given:
         version string
-        
+
         expect:
         major == maj
         minor == min
         patch == p
         tag == t
-        
+
         where:
         string                 | maj | min | p | t
         "1.2"                  | 1   | 2   | 0 | null
@@ -46,15 +47,14 @@ class GrailsVersionSpec extends Specification {
         "1.2.3.SNAPSHOT"       | 1   | 2   | 3 | "SNAPSHOT"
         "1.2.3.BUILD-SNAPSHOT" | 1   | 2   | 3 | "BUILD-SNAPSHOT"
     }
-    
-    @Unroll("ivy dependency quirk - #string - #required")
+
     def "ivy dependency quirk - #string - #required"() {
         when:
         version string
-        
+
         then:
         requiresExplicitIvyDependency == required
-        
+
         where:
         string  | required
         "1.2"   | false
@@ -62,6 +62,5 @@ class GrailsVersionSpec extends Specification {
         "1.3.1" | true
         "1.3.2" | false
     }
-    
 
 }
