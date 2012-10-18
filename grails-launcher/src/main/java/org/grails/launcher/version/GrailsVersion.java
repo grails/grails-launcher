@@ -84,4 +84,8 @@ public class GrailsVersion implements Serializable {
     public boolean isRequiresExplicitIvyDependency() {
         return is13() && patch < 2;
     }
+
+    public boolean isHasGrailsDependenciesPom() {
+        return is(2);
+    }
 }
