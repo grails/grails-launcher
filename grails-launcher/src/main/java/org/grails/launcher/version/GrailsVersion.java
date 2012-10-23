@@ -17,9 +17,6 @@ package org.grails.launcher.version;
 
 import java.io.Serializable;
 
-/**
- * Exposes build related information about a particular version of Grails. <p> Useful for build tools to setup a Grails execution conditionally based on the version.
- */
 public class GrailsVersion implements Serializable {
 
     private final String string;
@@ -27,6 +24,10 @@ public class GrailsVersion implements Serializable {
     private final int minor;
     private final int patch;
     private final String tag;
+
+    public static GrailsVersion parse(String version) {
+        return new GrailsVersionParser().parse(version);
+    }
 
     public GrailsVersion(String string, int major, int minor, int patch, String tag) {
         this.string = string;
@@ -70,29 +71,6 @@ public class GrailsVersion implements Serializable {
 
     public boolean is(int major, int minor, int patch) {
         return this.major == major && this.minor == minor && this.patch == patch;
-    }
-
-    public boolean is13() {
-        return is(1, 3);
-    }
-
-    /**
-     * Grails 1.3.0 and 1.3.1 did not declare grails-bootstrap's dependency on Ivy. <p> If this returns true, an explicit dependency for Ivy must be added (e.g. "org.apache.ivy:ivy:2.1.0")
-     */
-    public boolean isRequiresExplicitIvyDependency() {
-        return is13() && patch < 2;
-    }
-
-    public boolean isHasGrailsDependenciesPom() {
-        return is(2);
-    }
-
-    public boolean isSupportsProvidedDependencies() {
-        return is(2);
-    }
-
-    public boolean isSupportsBuildDependencies() {
-        return is(2);
     }
 
 }

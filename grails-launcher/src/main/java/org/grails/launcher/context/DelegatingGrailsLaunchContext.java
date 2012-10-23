@@ -17,6 +17,7 @@
 package org.grails.launcher.context;
 
 import org.grails.launcher.version.GrailsVersion;
+import org.grails.launcher.version.GrailsVersionQuirks;
 
 import java.io.File;
 import java.net.URLClassLoader;
@@ -31,6 +32,7 @@ public class DelegatingGrailsLaunchContext implements GrailsLaunchContext {
     private ClassLoader classLoader;
     private Object settings;
     private final GrailsVersion grailsVersion;
+    private final GrailsVersionQuirks grailsVersionQuirks;
 
     private String scriptName;
     private String env;
@@ -61,7 +63,7 @@ public class DelegatingGrailsLaunchContext implements GrailsLaunchContext {
             context.setBuildDependencies(source.getBuildDependencies());
         }
 
-        if (context.grailsVersion.isSupportsProvidedDependencies()) {
+        if (context.grailsVersionQuirks.isSupportsProvidedDependencies()) {
             if (source.getProvidedDependencies() != null) {
                 context.setProvidedDependencies(source.getProvidedDependencies());
             }
@@ -126,6 +128,7 @@ public class DelegatingGrailsLaunchContext implements GrailsLaunchContext {
 
     public DelegatingGrailsLaunchContext(GrailsVersion grailsVersion, ClassLoader classLoader, File grailsHome, File baseDir) {
         this.grailsVersion = grailsVersion;
+        this.grailsVersionQuirks = new GrailsVersionQuirks(grailsVersion);
         this.classLoader = classLoader;
 
         try {
@@ -313,7 +316,7 @@ public class DelegatingGrailsLaunchContext implements GrailsLaunchContext {
 
     @Override
     public void setBuildDependencies(List<File> dependencies) {
-        if (grailsVersion.isSupportsBuildDependencies()) {
+        if (grailsVersionQuirks.isSupportsBuildDependencies()) {
             invokeMethodWrapException(settings, "setBuildDependencies", new Class[]{List.class}, new Object[]{dependencies});
         } else {
             buildDependencies = dependencies;
@@ -323,7 +326,7 @@ public class DelegatingGrailsLaunchContext implements GrailsLaunchContext {
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     public List getBuildDependencies() {
-        if (grailsVersion.isSupportsBuildDependencies()) {
+        if (grailsVersionQuirks.isSupportsBuildDependencies()) {
             return (List) invokeMethodWrapException(settings, "getBuildDependencies", new Object[0]);
         } else {
             return buildDependencies;

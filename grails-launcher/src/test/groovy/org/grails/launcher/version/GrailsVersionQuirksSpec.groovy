@@ -13,40 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.grails.launcher.version
 
 import spock.lang.Specification
 import spock.lang.Unroll
 
 @Unroll
-class GrailsVersionSpec extends Specification {
+class GrailsVersionQuirksSpec extends Specification {
 
-    @Delegate GrailsVersion _v
+    @Delegate GrailsVersionQuirks _v
 
     void version(String v) {
-        _v = GrailsVersion.parse(v)
+        _v = new GrailsVersionQuirks(v)
     }
 
-    def "version - #string"() {
-        given:
+    def "ivy dependency quirk - #string - #required"() {
+        when:
         version string
 
-        expect:
-        major == maj
-        minor == min
-        patch == p
-        tag == t
+        then:
+        requiresExplicitIvyDependency == required
 
         where:
-        string                 | maj | min | p | t
-        "1.2"                  | 1   | 2   | 0 | null
-        "1.2.3"                | 1   | 2   | 3 | null
-        "1.2-SNAPSHOT"         | 1   | 2   | 0 | "SNAPSHOT"
-        "1.2.3-SNAPSHOT"       | 1   | 2   | 3 | "SNAPSHOT"
-        "1.2.SNAPSHOT"         | 1   | 2   | 0 | "SNAPSHOT"
-        "1.2.3.SNAPSHOT"       | 1   | 2   | 3 | "SNAPSHOT"
-        "1.2.3.BUILD-SNAPSHOT" | 1   | 2   | 3 | "BUILD-SNAPSHOT"
+        string  | required
+        "1.2"   | false
+        "1.3.0" | true
+        "1.3.1" | true
+        "1.3.2" | false
     }
-
 
 }
