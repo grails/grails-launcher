@@ -49,4 +49,19 @@ public class GrailsVersionQuirks {
         return grailsVersion.is(2);
     }
 
+    public boolean isRequiresExplicitLoggingBootstrapDependencies() {
+        return grailsVersion.is(1);
+    }
+
+    public boolean isRequiresExplicitGroovyDependency() {
+        return grailsVersion.is(2, 1);
+    }
+
+    public String getExplicitGroovyVersion() {
+        if (grailsVersion.is(2, 1)) {
+            return grailsVersion.getPatch() == 0 ? "1.8.6" : "1.8.8";
+        } else {
+            throw new IllegalStateException("Cannot get groovy version unless this version requires an explicit Groovy dependency");
+        }
+    }
 }
