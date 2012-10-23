@@ -24,7 +24,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.grails.launcher.util.ReflectionUtils.invokeMethodWrapException;
+import static org.grails.launcher.util.ReflectionUtils.invokeStaticMethodWrapException;
 
 public class RootLoaderFactory {
 
@@ -45,7 +45,7 @@ public class RootLoaderFactory {
                 rootLoader.addURL(loggingBootstrapJar.toURI().toURL());
             }
             Class cls = rootLoader.loadClass("org.springframework.util.Log4jConfigurer");
-            invokeMethodWrapException(cls, "initLogging", new Object[]{"classpath:grails-maven/log4j.properties"});
+            invokeStaticMethodWrapException(cls, "initLogging", new Object[]{"classpath:grails-maven/log4j.properties"});
         }
 
         return rootLoader;

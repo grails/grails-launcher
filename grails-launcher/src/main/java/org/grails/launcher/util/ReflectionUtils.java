@@ -57,4 +57,40 @@ public class ReflectionUtils {
         return target.getClass().getMethod(name, argTypes).invoke(target, args);
     }
 
+    public static Object invokeStaticMethodWrapException(Class<?> target, String name) {
+        return invokeStaticMethodWrapException(target, name, new Object[0]);
+    }
+
+    public static Object invokeStaticMethodWrapException(Class<?> target, String name, Object[] args) {
+        try {
+            return invokeStaticMethod(target, name, args);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Object invokeStaticMethodWrapException(Class<?> target, String name, Class<?>[] argTypes, Object[] args) {
+        try {
+            return invokeStaticMethod(target, name, argTypes, args);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Object invokeStaticMethod(Class<?> target, String name) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        return invokeStaticMethod(target, name, new Object[0]);
+    }
+
+    public static Object invokeStaticMethod(Class<?> target, String name, Object[] args) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        Class<?>[] argTypes = new Class[args.length];
+        for (int i = 0; i < args.length; i++) {
+            argTypes[i] = args[i].getClass();
+        }
+
+        return invokeStaticMethod(target, name, argTypes, args);
+    }
+
+    public static Object invokeStaticMethod(Class<?> target, String name, Class<?>[] argTypes, Object[] args) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        return target.getMethod(name, argTypes).invoke(null, args);
+    }
 }
