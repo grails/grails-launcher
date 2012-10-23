@@ -8,6 +8,8 @@ subprojects { project ->
     apply plugin: 'signing'
     apply from: rootProject.file("gradle/publish.gradle")
 
+    sourceCompatibility = 1.6
+
     repositories {
         mavenCentral()
     }
@@ -20,8 +22,8 @@ subprojects { project ->
     }
 
     dependencies {
-        groovy "org.codehaus.groovy:groovy-all:2.0.5"
-        testCompile "org.spockframework:spock-core:0.7-groovy-2.0"
+        groovy "org.codehaus.groovy:groovy-all:1.8.6"
+        testCompile "org.spockframework:spock-core:0.7-groovy-1.8"
     }
 
     task sourcesJar(type: Jar) {
