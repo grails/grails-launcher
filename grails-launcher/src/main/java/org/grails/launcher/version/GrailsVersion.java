@@ -36,6 +36,10 @@ public class GrailsVersion implements Serializable {
         this.tag = tag;
     }
 
+    public String toString() {
+        return getString();
+    }
+
     public String getString() {
         return string;
     }
@@ -82,4 +86,13 @@ public class GrailsVersion implements Serializable {
     public boolean isHasGrailsDependenciesPom() {
         return is(2);
     }
+
+    public boolean isSupportsProvidedDependencies() {
+        return is(2);
+    }
+
+    public boolean isSupportsBuildDependencies() {
+        return is(2);
+    }
+
 }
