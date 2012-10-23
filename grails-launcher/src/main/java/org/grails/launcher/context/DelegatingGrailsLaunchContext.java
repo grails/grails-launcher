@@ -20,6 +20,7 @@ import org.grails.launcher.version.GrailsVersion;
 
 import java.io.File;
 import java.net.URLClassLoader;
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.grails.launcher.util.ReflectionUtils.invokeMethod;
@@ -31,38 +32,94 @@ public class DelegatingGrailsLaunchContext implements GrailsLaunchContext {
     private Object settings;
     private final GrailsVersion grailsVersion;
 
-    String scriptName;
-    String env;
-    String args;
+    private String scriptName;
+    private String env;
+    private String args;
+
+    // Only used if this grails version doesn't support it
+    private List<File> buildDependencies;
 
     public static DelegatingGrailsLaunchContext copyOf(ClassLoader classLoader, GrailsLaunchContext source) {
         DelegatingGrailsLaunchContext context = new DelegatingGrailsLaunchContext(
                 source.getGrailsVersion(), classLoader, source.getGrailsHome(), source.getBaseDir()
         );
 
-        context.setScriptName(source.getScriptName());
-        context.setArgs(source.getArgs());
-        context.setEnv(source.getEnv());
-
         context.setDependenciesExternallyConfigured(source.isDependenciesExternallyConfigured());
         context.setPlainOutput(source.isPlainOutput());
 
-        context.setProvidedDependencies(source.getProvidedDependencies());
-        context.setCompileDependencies(source.getCompileDependencies());
-        context.setTestDependencies(source.getTestDependencies());
-        context.setRuntimeDependencies(source.getRuntimeDependencies());
-        context.setBuildDependencies(source.getBuildDependencies());
+        if (source.getScriptName() != null) {
+            context.setScriptName(source.getScriptName());
+        }
+        if (source.getArgs() != null) {
+            context.setArgs(source.getArgs());
+        }
+        if (source.getEnv() != null) {
+            context.setEnv(source.getEnv());
+        }
 
-        context.setGrailsWorkDir(source.getGrailsWorkDir());
-        context.setProjectWorkDir(source.getProjectWorkDir());
+        if (source.getBuildDependencies() != null) {
+            context.setBuildDependencies(source.getBuildDependencies());
+        }
 
-        context.setClassesDir(source.getClassesDir());
-        context.setTestClassesDir(source.getTestClassesDir());
-        context.setTestReportsDir(source.getTestReportsDir());
-        context.setResourcesDir(source.getResourcesDir());
+        if (context.grailsVersion.isSupportsProvidedDependencies()) {
+            if (source.getProvidedDependencies() != null) {
+                context.setProvidedDependencies(source.getProvidedDependencies());
+            }
+            if (source.getCompileDependencies() != null) {
+                context.setCompileDependencies(source.getCompileDependencies());
+            }
+        } else {
+            List<File> providedAndCompileDependencies = new LinkedList<File>();
 
-        context.setProjectPluginsDir(source.getProjectPluginsDir());
-        context.setGlobalPluginsDir(source.getGlobalPluginsDir());
+            boolean hasAny = false;
+            List<File> provided = source.getProvidedDependencies();
+            if (provided != null) {
+                providedAndCompileDependencies.addAll(provided);
+                hasAny = true;
+            }
+            List<File> compile = source.getCompileDependencies();
+            if (compile != null) {
+                providedAndCompileDependencies.addAll(compile);
+                hasAny = true;
+            }
+
+            if (hasAny) {
+                context.setCompileDependencies(providedAndCompileDependencies);
+            }
+        }
+
+        if (source.getRuntimeDependencies() != null) {
+            context.setRuntimeDependencies(source.getRuntimeDependencies());
+        }
+        if (source.getTestDependencies() != null) {
+            context.setTestDependencies(source.getTestDependencies());
+        }
+
+        if (source.getGrailsWorkDir() != null) {
+            context.setGrailsWorkDir(source.getGrailsWorkDir());
+        }
+        if (source.getProjectWorkDir() != null) {
+            context.setProjectWorkDir(source.getProjectWorkDir());
+        }
+        if (source.getClassesDir() != null) {
+            context.setClassesDir(source.getClassesDir());
+        }
+        if (source.getTestClassesDir() != null) {
+            context.setTestClassesDir(source.getTestClassesDir());
+        }
+        if (source.getTestReportsDir() != null) {
+            context.setTestReportsDir(source.getTestReportsDir());
+        }
+        if (source.getResourcesDir() != null) {
+            context.setResourcesDir(source.getResourcesDir());
+        }
+
+        if (source.getProjectPluginsDir() != null) {
+            context.setProjectPluginsDir(source.getProjectPluginsDir());
+        }
+        if (source.getGlobalPluginsDir() != null) {
+            context.setGlobalPluginsDir(source.getGlobalPluginsDir());
+        }
 
         return context;
     }
@@ -245,7 +302,7 @@ public class DelegatingGrailsLaunchContext implements GrailsLaunchContext {
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     public List getProvidedDependencies() {
-        return (List) invokeMethodWrapException(settings, "getProvidedDependencies", new Object[0]);
+        return (List) invokeMethodWrapException(settings, "getProvidedDependencies");
     }
 
     @Override
@@ -255,15 +312,22 @@ public class DelegatingGrailsLaunchContext implements GrailsLaunchContext {
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
-    public void setBuildDependencies(List dependencies) {
-        invokeMethodWrapException(settings, "setBuildDependencies", new Class[]{List.class}, new Object[]{dependencies});
+    public void setBuildDependencies(List<File> dependencies) {
+        if (grailsVersion.isSupportsBuildDependencies()) {
+            invokeMethodWrapException(settings, "setBuildDependencies", new Class[]{List.class}, new Object[]{dependencies});
+        } else {
+            buildDependencies = dependencies;
+        }
     }
 
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     public List getBuildDependencies() {
-        return (List) invokeMethodWrapException(settings, "getBuildDependencies", new Object[0]);
+        if (grailsVersion.isSupportsBuildDependencies()) {
+            return (List) invokeMethodWrapException(settings, "getBuildDependencies", new Object[0]);
+        } else {
+            return buildDependencies;
+        }
     }
 
     @Override
@@ -311,27 +375,22 @@ public class DelegatingGrailsLaunchContext implements GrailsLaunchContext {
     }
 
     public int launch() throws Exception {
-        return new ScriptRunner().run();
-    }
+        Object grailsScriptRunner = classLoader.loadClass("org.codehaus.groovy.grails.cli.GrailsScriptRunner").
+                getDeclaredConstructor(new Class[]{settings.getClass()}).
+                newInstance(settings);
 
-    class ScriptRunner {
-        int run() throws Exception {
-            Object grailsScriptRunner = classLoader.loadClass("org.codehaus.groovy.grails.cli.GrailsScriptRunner").
-                    getDeclaredConstructor(new Class[]{settings.getClass()}).
-                    newInstance(settings);
+        Class[] paramTypes;
+        Object[] params;
 
-            Class[] paramTypes;
-            Object[] params;
-
-            if (getEnv() == null) {
-                paramTypes = new Class[]{String.class, String.class};
-                params = new Object[]{getScriptName(), getArgs()};
-            } else {
-                paramTypes = new Class[]{String.class, String.class, String.class};
-                params = new Object[]{getScriptName(), getArgs(), getEnv()};
-            }
-
-            return (Integer) invokeMethod(grailsScriptRunner, "executeCommand", paramTypes, params);
+        if (getEnv() == null) {
+            paramTypes = new Class[]{String.class, String.class};
+            params = new Object[]{getScriptName(), getArgs()};
+        } else {
+            paramTypes = new Class[]{String.class, String.class, String.class};
+            params = new Object[]{getScriptName(), getArgs(), getEnv()};
         }
+
+        return (Integer) invokeMethod(grailsScriptRunner, "executeCommand", paramTypes, params);
     }
+
 }
