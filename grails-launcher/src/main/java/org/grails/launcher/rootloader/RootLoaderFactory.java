@@ -29,8 +29,12 @@ import static org.grails.launcher.util.ReflectionUtils.invokeStaticMethodWrapExc
 public class RootLoaderFactory {
 
     public RootLoader create(GrailsLaunchContext context) throws MalformedURLException, ClassNotFoundException {
+        return create(context, ClassLoader.getSystemClassLoader());
+    }
+
+    public RootLoader create(GrailsLaunchContext context, ClassLoader parentLoader) throws MalformedURLException, ClassNotFoundException {
         URL[] urls = generateBuildPath(context.getBuildDependencies());
-        final RootLoader rootLoader = new RootLoader(urls, ClassLoader.getSystemClassLoader());
+        final RootLoader rootLoader = new RootLoader(urls, parentLoader);
 
         List<File> loggingBootstrapJars = new ArrayList<File>();
         for (File file : context.getCompileDependencies()) {
