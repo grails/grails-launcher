@@ -377,10 +377,17 @@ public class DelegatingGrailsLaunchContext implements GrailsLaunchContext {
         }
     }
 
+    private boolean isInteractiveMode() {
+        String args = getArgs();
+        return args == null || !args.matches("(^|.*\\s)--?non-interactive.*");
+    }
+
     public int launch() throws Exception {
         Object grailsScriptRunner = classLoader.loadClass("org.codehaus.groovy.grails.cli.GrailsScriptRunner").
                 getDeclaredConstructor(new Class[]{settings.getClass()}).
                 newInstance(settings);
+
+        invokeMethod(grailsScriptRunner, "setInteractive", new Class[]{boolean.class}, new Object[]{isInteractiveMode()});
 
         Class[] paramTypes;
         Object[] params;

@@ -70,12 +70,31 @@ class DelegatingGrailsLaunchContextSpec extends Specification {
         testRunner.lastScript["name"] == "Compile"
         testRunner.lastScript["args"] == null
         testRunner.lastScript["env"] == null
+        testRunner.interactiveMode
 
         and:
         context(scriptName: "TestApp", args: "-unit -rerun", env: "test").launch() == 1
         testRunner.lastScript["name"] == "TestApp"
         testRunner.lastScript["args"] == "-unit -rerun"
         testRunner.lastScript["env"] == "test"
+    }
+
+    def isInteractive(String args) {
+        context(scriptName: "Compile", args: args).launch()
+        testRunner.interactiveMode
+    }
+
+    void "interactive mode"() {
+        expect:
+        isInteractive("-as -asd")
+        isInteractive("-as -asd --asdf-non-interactive")
+        isInteractive("--asdf-non-interactive")
+        !isInteractive("-as -asd --non-interactive")
+        !isInteractive("-as -asd --non-interactive --asdfa")
+        !isInteractive("-as -asd -non-interactive --asdfa")
+        !isInteractive("-as -asd -non-interactive")
+        !isInteractive("-non-interactive")
+        !isInteractive("--non-interactive")
     }
 
     void testExecutionWithCustomSettings() {
@@ -137,6 +156,7 @@ class MockGrailsScriptRunner {
     static testCase
 
     def lastScript
+    boolean interactiveMode
 
     MockGrailsScriptRunner(MockBuildSettings settings) {
         testCase.testRunner = this
