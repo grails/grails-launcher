@@ -32,6 +32,7 @@ import java.util.List;
  */
 public class ForkedGrailsLauncher implements GrailsLauncher {
 
+    public static final String EXECUTION_CONTEXT_SYSTEM_PROPERTY = "grails.build.execution.context";
     private int maxMemory = 1024;
     private int minMemory = 512;
     private int maxPerm = 256;
@@ -106,7 +107,7 @@ public class ForkedGrailsLauncher implements GrailsLauncher {
     }
 
     public static void main(String[] args) {
-        String location = System.getProperty("grails.build.execution.context");
+        String location = System.getProperty(EXECUTION_CONTEXT_SYSTEM_PROPERTY);
         if (location != null) {
             File f = new File(location);
             FileInputStream fis = null;
@@ -120,7 +121,6 @@ public class ForkedGrailsLauncher implements GrailsLauncher {
                 System.setProperty("grails.console.enable.interactive", "false");
 
                 System.exit(new InProcessGrailsLauncher().launch(ec));
-
             } catch (FileNotFoundException e) {
                 fatalError(e);
             } catch (ClassNotFoundException e) {

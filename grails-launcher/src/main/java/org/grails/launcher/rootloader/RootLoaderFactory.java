@@ -19,12 +19,13 @@ package org.grails.launcher.rootloader;
 import org.grails.launcher.context.GrailsLaunchContext;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.grails.launcher.util.ReflectionUtils.invokeStaticMethodWrapException;
+import static org.grails.launcher.util.ReflectionUtils.invokeStaticMethod;
 
 public class RootLoaderFactory {
 
@@ -49,7 +50,10 @@ public class RootLoaderFactory {
                 rootLoader.addURL(loggingBootstrapJar.toURI().toURL());
             }
             Class cls = rootLoader.loadClass("org.springframework.util.Log4jConfigurer");
-            invokeStaticMethodWrapException(cls, "initLogging", new Object[]{"classpath:grails-maven/log4j.properties"});
+            try {
+                invokeStaticMethod(cls, "initLogging", new Object[]{"classpath:grails-maven/log4j.properties"});
+            } catch (Exception ignore) {
+            }
         }
 
         return rootLoader;

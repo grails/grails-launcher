@@ -20,15 +20,20 @@ import org.grails.launcher.version.GrailsVersion;
 import org.grails.launcher.version.GrailsVersionQuirks;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.grails.launcher.util.ReflectionUtils.invokeMethod;
 import static org.grails.launcher.util.ReflectionUtils.invokeMethodWrapException;
+import static org.grails.launcher.util.ReflectionUtils.invokeStaticMethod;
 
 public class DelegatingGrailsLaunchContext implements GrailsLaunchContext {
 
+    private static final String PROJECT_COMPILE_CLASS = "org.codehaus.groovy.grails.compiler.GrailsProjectCompiler";
+    private static final String PLUGIN_BUILD_SETTINGS_CLASS = "grails.util.PluginBuildSettings";
     private ClassLoader classLoader;
     private Object settings;
     private final GrailsVersion grailsVersion;
@@ -158,6 +163,7 @@ public class DelegatingGrailsLaunchContext implements GrailsLaunchContext {
     public void setGrailsHome(File grailsHome) {
         invokeMethodWrapException(settings, "setGrailsHome", new Class<?>[]{File.class}, new Object[]{grailsHome});
     }
+
     @Override
     public String getScriptName() {
         return scriptName;
