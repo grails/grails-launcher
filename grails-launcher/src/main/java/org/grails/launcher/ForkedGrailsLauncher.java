@@ -32,7 +32,6 @@ import java.util.List;
  */
 public class ForkedGrailsLauncher implements GrailsLauncher {
 
-    public static final String EXECUTION_CONTEXT_SYSTEM_PROPERTY = "grails.build.execution.context";
     private int maxMemory = 1024;
     private int minMemory = 512;
     private int maxPerm = 256;
@@ -63,7 +62,7 @@ public class ForkedGrailsLauncher implements GrailsLauncher {
 
 
         FileOutputStream fos = null;
-        File tempFile = null;
+        File tempFile;
         try {
             String baseName = launchContext.getBaseDir().getCanonicalFile().getName();
             tempFile = File.createTempFile(baseName, "grails-execution-context");
@@ -73,11 +72,12 @@ public class ForkedGrailsLauncher implements GrailsLauncher {
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(launchContext);
 
-            List<String> cmd = new ArrayList<String>(Arrays.asList("java", "-Xmx" + maxMemory + "M", "-Xms" + minMemory + "M", "-XX:MaxPermSize=" + maxPerm + "m", "-Dgrails.build.execution.context=" + tempFile.getCanonicalPath(), "-cp", cp.toString()));
+            List<String> cmd = new ArrayList<String>(Arrays.asList("java", "-Xmx" + maxMemory + "M", "-Xms" + minMemory + "M", "-XX:MaxPermSize=" + maxPerm + "m", "-cp", cp.toString()));
             if (debug) {
                 cmd.addAll(Arrays.asList("-Xdebug", "-Xnoagent", "-Dgrails.full.stacktrace=true", "-Djava.compiler=NONE", "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"));
             }
             cmd.add(getClass().getName());
+            cmd.add(tempFile.getCanonicalPath());
             processBuilder
                     .directory(launchContext.getBaseDir())
                     .redirectErrorStream(true)
@@ -106,48 +106,6 @@ public class ForkedGrailsLauncher implements GrailsLauncher {
         }
     }
 
-    public static void main(String[] args) {
-        String location = System.getProperty(EXECUTION_CONTEXT_SYSTEM_PROPERTY);
-        if (location != null) {
-            File f = new File(location);
-            FileInputStream fis = null;
-
-            try {
-                fis = new FileInputStream(f);
-                ObjectInputStream ois = new ObjectInputStream(fis);
-                GrailsLaunchContext ec = (GrailsLaunchContext) ois.readObject();
-
-                System.setProperty("grails.console.enable.terminal", "false");
-                System.setProperty("grails.console.enable.interactive", "false");
-
-                System.exit(new InProcessGrailsLauncher().launch(ec));
-            } catch (FileNotFoundException e) {
-                fatalError(e);
-            } catch (ClassNotFoundException e) {
-                fatalError(e);
-            } catch (IOException e) {
-                fatalError(e);
-            } catch (Throwable e) {
-                fatalError(e);
-            } finally {
-                if (fis != null) {
-                    try {
-                        fis.close();
-                    } catch (IOException e) {
-                        // ignore
-                    }
-                }
-            }
-        } else {
-            System.exit(1);
-        }
-    }
-
-    protected static void fatalError(Throwable e) {
-        System.err.println("Fatal error forking Grails JVM: " + e.getMessage());
-        e.printStackTrace(System.err);
-        System.exit(1);
-    }
 
     private static class TextDumper implements Runnable {
         InputStream in;
