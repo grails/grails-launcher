@@ -36,6 +36,7 @@ public class Main {
 
         try {
             new Main(args[0]).run();
+	    System.exit(0);
         } catch (Exception e) {
             System.err.println("Fatal error forking Grails JVM: " + e.getMessage());
             e.printStackTrace(System.err);
