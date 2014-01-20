@@ -1,6 +1,6 @@
 subprojects { project ->
     description = "A standalone library for launching any version of Grails in the same JVM with an isolated classpath"
-    version = "1.1-SNAPSHOT"
+    version = "1.1"
     group = "org.grails"
 
     apply plugin: "groovy"
